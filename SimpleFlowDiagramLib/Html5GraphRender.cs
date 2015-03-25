@@ -18,13 +18,26 @@ namespace SimpleFlowDiagramLib
             string RenderedHtml = null;
             const string HTMLTEMPLATE = @"<!DOCTYPE HTML>
                                     <html>
-                                      <head>
-                                        <style>
-                                          body {
-                                            margin: 0px;
-                                            padding: 0px;
-                                          }
-                                        </style>
+                                      <script type='text/javascript'>
+                                        function roundRect(ctx, x, y, w, h, radius, lineColor, lineWidth)
+                                        {
+                                          var r = x + w;
+                                          var b = y + h;
+                                          ctx.beginPath();
+                                          ctx.strokeStyle=lineColor;
+                                          ctx.lineWidth=lineWidth;
+                                          ctx.moveTo(x+radius, y);
+                                          ctx.lineTo(r-radius, y);
+                                          ctx.quadraticCurveTo(r, y, r, y+radius);
+                                          ctx.lineTo(r, y+h-radius);
+                                          ctx.quadraticCurveTo(r, b, r-radius, b);
+                                          ctx.lineTo(x+radius, b);
+                                          ctx.quadraticCurveTo(x, b, x, b-radius);
+                                          ctx.lineTo(x, y+radius);
+                                          ctx.quadraticCurveTo(x, y, x+radius, y);
+                                          ctx.stroke();
+                                        }
+                                        </script>
                                       </head>
                                       <body>
                                         <canvas id='GraphCanvas' width='$OVERALL_WIDTH$' height='$OVERALL_HEIGHT$'></canvas>
@@ -89,13 +102,10 @@ namespace SimpleFlowDiagramLib
         {
             string RenderedNode = null;
             const string NODE_TEMPLATE = @"context.beginPath();
-                                            context.rect($NODE_X$, $NODE_Y$, $NODE_WIDTH$, $NODE_HEIGHT$);
                                             context.fillStyle = '$NODE_BACKCOLOR$';
+                                            roundRect(context, $NODE_X$, $NODE_Y$, $NODE_WIDTH$, $NODE_HEIGHT$, $RADIUS$, '$NODE_BORDERCOLOR$', $LINEWIDTH$);
                                             context.fill();
-                                            context.lineWidth = $LINEWIDTH$;
-                                            context.strokeStyle = '$NODE_BORDERCOLOR$';
-                                            context.stroke();
-	  
+
 	                                        context.font='$NODE_HEADER_FONTSTRING$';
 	                                        context.fillStyle = '$NODE_HEADER_FONTCOLOR$';
 	                                        context.fillText('$NODE_HEADER$',$NODE_HEADER_X$,$NODE_HEADER_Y$);
@@ -110,7 +120,8 @@ namespace SimpleFlowDiagramLib
 
             RenderedNode = RenderedNode.Replace("$LINEWIDTH$", DisplaySettings.LineWidth.ToString());
             RenderedNode = RenderedNode.Replace("$NODE_BACKCOLOR$", DisplaySettings.NodeBackcolorName);
-            RenderedNode = RenderedNode.Replace("$NODE_BORDERCOLOR$", DisplaySettings.NodeBorderColorName); 
+            RenderedNode = RenderedNode.Replace("$NODE_BORDERCOLOR$", DisplaySettings.NodeBorderColorName);
+            RenderedNode = RenderedNode.Replace("$RADIUS$", (Node.Height/4).ToString());
 
             RenderedNode = RenderedNode.Replace("$NODE_X$", Node.x.ToString());
             RenderedNode = RenderedNode.Replace("$NODE_Y$", Node.y.ToString());

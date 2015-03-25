@@ -21,7 +21,7 @@ namespace DemoSimpleFlowDiagramLib
             CanvasDefinition Canvas = DiagramCanvasEngine.GenerateLayout(
                         Nodes,
                         Node.DEFAULT_NODE_HEIGHT / 2,
-                        CanvasDefinition.LayoutDirection.LeftToRight
+                        CanvasDefinition.LayoutDirection.TopToBottom
                         );
             Console.WriteLine("Finished calculating layout");
 

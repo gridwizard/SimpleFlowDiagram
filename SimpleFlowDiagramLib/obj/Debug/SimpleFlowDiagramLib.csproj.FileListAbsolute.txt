@@ -1,0 +1,14 @@
+c:\temp\test\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\bin\Debug\SimpleFlowDiagramLib.dll
+c:\temp\test\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\bin\Debug\SimpleFlowDiagramLib.pdb
+c:\temp\test\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.dll
+c:\temp\test\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.pdb
+G:\Others\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\bin\Debug\SimpleFlowDiagramLib.dll
+G:\Others\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\bin\Debug\SimpleFlowDiagramLib.pdb
+G:\Others\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.csprojResolveAssemblyReference.cache
+G:\Others\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.dll
+G:\Others\Dataflow_MsSQLProfiler\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.pdb
+D:\Git\SimpleFlowDiagram\SimpleFlowDiagramLib\bin\Debug\SimpleFlowDiagramLib.dll
+D:\Git\SimpleFlowDiagram\SimpleFlowDiagramLib\bin\Debug\SimpleFlowDiagramLib.pdb
+D:\Git\SimpleFlowDiagram\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.csprojResolveAssemblyReference.cache
+D:\Git\SimpleFlowDiagram\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.dll
+D:\Git\SimpleFlowDiagram\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.pdb

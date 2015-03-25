@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoSimpleFlowDiagramLib", "DemoSimpleFlowDiagramLib\DemoSimpleFlowDiagramLib.csproj", "{96397BCD-3738-4731-A58E-D0BF91C9843E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFlowDiagramLib", "SimpleFlowDiagramLib\SimpleFlowDiagramLib.csproj", "{639F4377-369B-4C13-BDDD-6B9F9910049F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96397BCD-3738-4731-A58E-D0BF91C9843E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96397BCD-3738-4731-A58E-D0BF91C9843E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96397BCD-3738-4731-A58E-D0BF91C9843E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96397BCD-3738-4731-A58E-D0BF91C9843E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{639F4377-369B-4C13-BDDD-6B9F9910049F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{639F4377-369B-4C13-BDDD-6B9F9910049F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{639F4377-369B-4C13-BDDD-6B9F9910049F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{639F4377-369B-4C13-BDDD-6B9F9910049F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

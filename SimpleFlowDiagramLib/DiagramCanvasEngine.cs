@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleFlowDiagramLib
 {
+    // https://gridwizard.wordpress.com/2015/03/31/simpleflowdiagramlib-simple-c-library-to-serialize-graph-to-xml-and-vice-versa/
     public class DiagramCanvasEngine
     {
         // Set x,y,width,height of each Node

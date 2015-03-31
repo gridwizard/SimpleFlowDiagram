@@ -1,0 +1,5 @@
+D:\Passive Workspace\Learning Samples\DynamicIOStream\DynamicIOStream\bin\Debug\LearningMahesh.DynamicIOStream.dll
+D:\Passive Workspace\Learning Samples\DynamicIOStream\DynamicIOStream\bin\Debug\LearningMahesh.DynamicIOStream.pdb
+D:\Passive Workspace\Learning Samples\DynamicIOStream\DynamicIOStream\obj\Debug\ResolveAssemblyReference.cache
+D:\Passive Workspace\Learning Samples\DynamicIOStream\DynamicIOStream\obj\Debug\LearningMahesh.DynamicIOStream.dll
+D:\Passive Workspace\Learning Samples\DynamicIOStream\DynamicIOStream\obj\Debug\LearningMahesh.DynamicIOStream.pdb

@@ -60,5 +60,7 @@ namespace SimpleFlowDiagramLib
         public string NodeHeader { get; set; }
         public string NodeDetail { get; set; }
         public string NodeHyperLink { get; set; }
+
+        public int Depth { get; set; }
     }
 }

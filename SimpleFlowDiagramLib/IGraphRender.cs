@@ -8,7 +8,7 @@ namespace SimpleFlowDiagramLib
 {
     public interface IGraphRender
     {
-        void RenderGraph(
+        string RenderGraph(
             CanvasDefinition Canvas,
             IList<Node> Nodes,
             GraphDisplayFormatSettings DisplaySettings,

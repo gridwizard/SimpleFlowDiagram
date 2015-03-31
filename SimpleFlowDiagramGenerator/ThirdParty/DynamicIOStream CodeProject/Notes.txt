@@ -1,0 +1,512 @@
+﻿
+*********************************************************************************
+Power of Dynamic: Reading XML and CSV files made easy using DynamicObject in C#
+*********************************************************************************
+1. INTRODUCTION
+
+In my past assignments, i came across parsing XML and CSV files. I always ended up using several XML parsing APIs.
+I started working in C# from 2.0. I remember i was using System.Xml.XMlTextReader, System.Xml.XmlReader, System.Xml.Linq.XElement,
+System.Xml.XDocument. There are several pre-defined classes in C# for parsing and creating XML file.
+In case of CSV, its a kind of text file parsing but every developer had their own approach of reading a CSV file no matter its good or bad approach.
+
+I wish if some XML parsing APIs gives me result value by just passing structure of xml nodes. For example, if below if my XML file:
+<Customer>
+	<Name>Mahesh Kumar</Name>
+</Customer>
+If i specify "Customer.Name", it should results in "Mahesh Kumar". i realised by dream partially using XPath. But, still i am not compromised.
+
+There should be some dynamic ways of reading or creating XML and CSV file. 
+This article explains in details about how to read XML and CSV files dynamically just by passing structure of XML nodes using System.Dynamic.DynamicObject in C#.
+
+2. PREFACE
+
+when i read an article about C# 4.0 Dynamic Programming. I saw an example in MSDN blog that interprets text file and fetch the line thats starts with user input string using DynamicObject.
+This gave me an idea that, i can use "DynamicObject" for reading XML and CSV files. i wrote a small prototype, it really worked well.
+
+After few months, i just went through an article that also had similar approach of my thinking. So, i changed my code by adding more functionalities
+of reading or modifying XML/CSV files. This is how, this article evolved.
+
+3. CODE DOWNLOAD
+
+
+
+4. DYNAMIC OBJECT in C#
+
+"dynamic" is a data type that binds to actual type run time. dynamic variable can hold any data type. There is no intellisense support for dynamic.
+Its developer's intelligence to handle it to avoid runtime exception. Here is a small example of dynamic:
+
+dynamic myDynamic = "Something";
+Console.WriteLine(myDynamic.GetType().FullName);	// results System.String
+
+"System.Dynamic.DynamicObject" expose members such as properties and methods at run time, instead of in at compile time. 
+This enables you to create objects to work with structures that do not match a static type or format.
+
+The DynamicObject class enables you to override operations like getting or setting a member, calling a method, 
+or performing any binary, unary, or type conversion operation.
+
+To know about DynamicObject refer: http://msdn.microsoft.com/en-us/library/system.dynamic.dynamicobject(VS.100).aspx
+
+4.1 REFLECTION Vs DYNAMIC
+
+Although both Reflection and Dynamic serves for same purpose but, Dynamic is a cleanest form of reflection.
+Consider the below example using reflection and dynamic:
+
+#region Reflection Vs Dynamic
+
+// --- Using Reflection ---
+object usingReflection = Activator.CreateInstance(Type.GetType("System.Text.StringBuilder"));
+MethodInfo ObjectMethodInfo = usingReflection.GetType().GetMethod("Append", new[] { typeof(string) });
+ObjectMethodInfo.Invoke(usingReflection, new object[] { "Hello" });
+Console.WriteLine(
+    usingReflection.GetType().GetMethod("ToString", new Type[0]).Invoke(usingReflection, null)
+);
+
+// --- Using Dynamic ---
+dynamic usingDynamic = Activator.CreateInstance(Type.GetType("System.Text.StringBuilder"));
+usingDynamic.Append("Hello");
+Console.WriteLine(usingDynamic.ToString());
+
+#endregion
+
+Dynamic variable will be type casting to actual object at run time and call properties or methods.
+
+5. PARSING XML DOCUMENT USING System.Dynamic.DynamicObject
+
+At end of this article, i want to make my readers to get to know how to parse XML file like below:
+Consider this is your XML document:
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+  <Customers>
+    <Customer CustomerID="GREAL">
+      <CompanyName>Great Lakes Food Market</CompanyName>
+      <ContactName>Howard Snyder</ContactName>
+      <ContactTitle>Marketing Manager</ContactTitle>
+      <Phone>(503) 555-7555</Phone>
+      <FullAddress>
+        <Address>2732 Baker Blvd.</Address>
+        <City>Eugene</City>
+        <Region>OR</Region>
+        <PostalCode>97403</PostalCode>
+        <Country>USA</Country>
+      </FullAddress>
+    </Customer>
+ </Customers>
+</Root>
+
+If i want to read the value of "CompanyName" of a Customer, i should be doing like below:
+
+dynamic customerObj = new DynamicObject(strXmlContent);				// Lets say, strXmlContent variable holds value of above XML content
+string compName = customerObj.Root.Customers.Customer.CompanyName;
+
+In the above example, you are not using any API's rather you are just specifying the structure of XML node which you want to read the value of it.
+
+5.1 DYNAMIC XML STREAM
+
+i simply use constructor to feed List<System.Xml.Linq.XElement>. This class has several static overloaded "Load()" method that creates
+object of "DynamicXmlStream" and returns it.
+- static DynamicXmlStream Parse(string, LoadOptions): allows user to pass xml string directly and create the dynamic object
+- static DynamicXmlStream Create(string): allows user to create XML document by specifying root element name as parameter.
+This class is extended from System.Dynamic.DynamicObject and IEnumerable<DynamicXmlStream>.
+There are several overrided methods from "DynamicObject" to accomplish dynamic parsing/creation of XML file.
+
+5.1.1 TryGetMember()
+
+This method gets information about what property it was called for through the binder parameter. 
+As you can see, the binder.Name contains the actual name of the property. The TryGetMember method returns true if the operation is successful. 
+But the actual result of the operation must be assigned to the out parameter result.
+
+public override bool TryGetMember(GetMemberBinder binder, out object result)
+{
+    result = null;
+	if (binder.Name == DynamicXmlStream.Value)
+	{
+		var items = _XmlElementCollection[0].Descendants(XName.Get("Value"));
+		if (items == null || items.Count() == 0)
+		{
+			result = _XmlElementCollection[0].Value;
+		}
+		else
+		{
+			result = new DynamicXmlStream(items);
+		}
+	}
+	else if (binder.Name == DynamicXmlStream.Count)
+	{
+		result = _XmlElementCollection.Count;
+	}
+	else
+	{
+		XAttribute xAttribute = _XmlElementCollection[0].Attribute(XName.Get(binder.Name));
+		if (null != xAttribute)
+		{
+			result = xAttribute;
+		}
+		else
+		{
+			IEnumerable<XElement> xElementItems = _XmlElementCollection[0].DescendantsAndSelf(XName.Get(binder.Name));
+			if (xElementItems == null || xElementItems.Count() == 0)
+			{
+				return false;
+			}
+			result = new DynamicXmlStream(xElementItems);
+		}
+	}
+    return true;
+}
+
+5.1.2 TrySetMember()
+
+This method gets the element node as mentioned in binder.Name and sets the value of the xml node.
+The value is mentioned in the second parameter as object type.
+
+public override bool TrySetMember(SetMemberBinder binder, object value)
+{
+	if (binder.Name == DynamicXmlStream.Value)
+	{
+		_XmlElementCollection[0].Value = value.ToString();
+	}
+	else
+	{
+		XElement setNode = _XmlElementCollection[0].Element(binder.Name);
+		if (setNode != null)
+		{
+			setNode.SetValue(value);
+		}
+		else
+		{
+			if (value.GetType() == typeof(DynamicXmlStream))
+			{
+				_XmlElementCollection[0].Add(new XElement(binder.Name));
+			}
+			else
+			{
+				_XmlElementCollection[0].Add(new XElement(binder.Name, value));
+			}
+		}
+	}
+	return true;
+}
+
+5.1.3 TryGetIndex()
+
+This methods serves for two purpose:
+#1: if there are multiple nodes of same name, "int" index act as a array to fetch the specified index value.
+#2: if index type is string, it will search for attribute on the current node of name mentioned in index.
+
+public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+{
+	result = null;
+	if (null != indexes[0])
+	{
+		if (typeof(int) == indexes[0].GetType())
+		{
+			int index = (int)indexes[0];
+			result = new DynamicXmlStream(_XmlElementCollection[index]);
+			return true;
+		}
+		else if (typeof(string) == indexes[0].GetType())
+		{
+			string attributeName = (string)indexes[0];
+			result = _XmlElementCollection[0].Attribute(XName.Get(attributeName)).Value;
+			return true;
+		}
+	}
+	return false;
+}
+
+5.1.4 TrySetIndex()
+
+This method serves to set value to the attribute as specified in third parameter as object type.
+
+public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
+{
+	if (null != indexes[0])
+	{
+		if (typeof(string) == indexes[0].GetType())
+		{
+			_XmlElementCollection[0].SetAttributeValue((string)indexes[0], value);
+			return true;
+		}
+	}
+	return false;
+}
+
+5.1.5 TryConvert()
+
+This methods used to convert dynamic object to XElement or List<XElement> or string.
+The user can simply cast the dynamic object to any of the above 3 types as normal syntax like:
+XElement xElem = (XElement)dynamicXmlObject;
+
+public override bool TryConvert(ConvertBinder binder, out object result)
+{
+	if (binder.Type == typeof(XElement))
+	{
+		result = _XmlElementCollection[0];
+	}
+	else if (binder.Type == typeof(List<XElement>) || (binder.Type.IsArray && binder.Type.GetElementType() == typeof(XElement)))
+	{
+		result = _XmlElementCollection;
+	}
+	else if (binder.Type == typeof(String))
+	{
+		result = _XmlElementCollection[0].Value;
+	}
+	else
+	{
+		result = false;
+		return false;
+	}
+	return true;
+}
+
+5.1.6 TryInvokeMember()
+
+This method help the DynamicXmlStream class to act similar like System.Xml.Linq.XElement.
+Any method of XElement can be invoked from this DynamicXmlStream without casting.
+
+public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+{
+	Type xmlType = typeof(XElement);
+	try
+	{
+		result = xmlType.InvokeMember(
+			binder.Name, 
+			BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance,
+			null, _XmlElementCollection[0], args
+		);
+		return true;
+	}
+	catch
+	{
+		result = null;
+		return false;
+	}
+}
+
+5.1.7 Other Public Methods
+
+AsDynamicEnumerable(): used to cast the sequence of XElement objects to dynamic that makes easy for user to enumerate using foreach.
+GetEnumerator(): used to enumerate DynamicXmlStream using foreach.
+
+5.1.8 XElementExtension class
+
+This static class has extension method thats allows to convert System.Xml.Linq.XElement object to DynamicXmlStream.
+So, user can either cast DynamicXmlStream to XElement and viceversa.
+
+public static class XElementExtension
+{
+	public static DynamicXmlStream ToDynamicXmlStream(this XElement xElement)
+	{
+		DynamicXmlStream dynamicXmlStream = new DynamicXmlStream(xElement);
+		return dynamicXmlStream;
+	}
+}
+
+6. PARSING CSV DOCUMENT USING System.Dynamic.DynamicObject
+
+Consider, this is your CSV (Comma Seperated Value) file:
+
+CustomerID,EmployeeID,Address
+GREAL,6,USA
+HUNGC,3,UK
+
+i wish to read Address of Customer GREAL as "order.Address", which depends on the row that dynamic object pointed currently.
+if it pointed on first row, value is USA. if its second row, value is UK.
+
+6.1 DYNAMIC CSV STREAM
+
+DynamicCsvStream class acts as a falicitator to create DynamicCsvRow object. DynamicCsvStream extended from IEnumerable<DynamicCsvRow>.
+In DynamicCsvStream, i simply use constructor to feed header columns and List<DynamicCsvRow> that holds the value of each row in the CSV file.
+- static DynamicCsvStream Load(StreamReader): get the StreamReader object and reads teh header column and fill List<DynamicCsvRow> with each row value.
+- static DynamicCsvStream Parse(string): calls Load(StreamReader) method
+- GetEnumerator(): used to enumerate DynamicCsvStream using foreach statement.
+- IEnumerable<dynamic> AsDynamicEnumerable(): used to cast the sequence of DynamicCsvRow objects to dynamic that makes easy for user to enumerate using foreach.
+
+6.2 DYNAMIC CSV ROW
+
+DynamicCsvRow class extended from System.Dynamic.DynamicObject and IEnumerable<string>. It holds the row value and allows it to read dynamically.
+Each row is actually stored in List<string>. Each element in the List is a comma seperated value.
+
+6.2.1 TryGetMember()
+
+This method allows to get the column value of a column name specified in binder.Name.
+User can just mention column name to read the value.
+
+public override bool TryGetMember(GetMemberBinder binder, out object result)
+{
+	int indexOfColumn = _HeaderColumns.IndexOf(binder.Name);
+	result = null;
+	if (-1 != indexOfColumn)
+	{
+		result = (indexOfColumn < _RowColumns.Count) 
+			? _RowColumns[indexOfColumn]
+			: null;
+	}
+	return (indexOfColumn >= 0);
+}
+
+6.2.2 TrySetMember()
+
+This method allows to set or alter the value of the column that specified with column name as value mentioned as object type.
+
+public override bool TrySetMember(SetMemberBinder binder, object value)
+{
+	int indexOfColumn = _HeaderColumns.IndexOf(binder.Name);
+	if (-1 != indexOfColumn)
+	{
+		_RowColumns[indexOfColumn] = value.ToString();
+	}
+	return (indexOfColumn >= 0);
+}
+
+6.2.3 TryGetIndex()
+
+If the index specified in "int" type, it will fetch the value of index in comma seperated list of values.
+If the index specified in "string type, it will look for the header name and return correspoding value. This will be useful is Column header has any white spaces.
+Eg: csvObj["Customer Name] (we cannot specify like "csvObj.Customer Name").
+
+public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+{
+	result = null;
+	if (null != indexes[0])
+	{
+		if (typeof(int) == indexes[0].GetType())
+		{
+			int index = (int)indexes[0];
+			result = (index <= _RowColumns.Count)
+				? _RowColumns[index]
+				: null;
+			return true;
+		}
+		else if (typeof(string) == indexes[0].GetType())
+		{
+			string attribute = (string)indexes[0];
+			int index = _HeaderColumns.IndexOf(attribute);
+			result = (-1 != index && index < _RowColumns.Count)
+				? _RowColumns[index]
+				: null;
+			return true;
+		}
+	}		
+	return false;
+}
+
+6.2.4 TrySetIndex()
+
+It will act similar like TryGetIndex but it will set the value as mentioned in object type.
+This method will accept both int and string type index.
+
+public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
+{
+	if (null != indexes[0])
+	{
+		if (typeof(int) == indexes[0].GetType())
+		{
+			int indexToChange = (int)indexes[0];
+			if (indexToChange <= _RowColumns.Count)
+			{
+				_RowColumns[indexToChange] = value.ToString();
+			}
+			return true;
+		}
+		else if (typeof(string) == indexes[0].GetType())
+		{
+			string attribute = (string)indexes[0];
+			int indexToChange = _HeaderColumns.IndexOf(attribute);
+			if (indexToChange <= _RowColumns.Count)
+			{
+				_RowColumns[indexToChange] = value.ToString();
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+6.2.5 TryConvert()
+
+This method allows to directly convert DynamicCsvRow to List<string> as comma sperated values or just string value with raw output of a row.
+
+public override bool TryConvert(ConvertBinder binder, out object result)
+{
+	result = null;
+	if (binder.Type == typeof(List<string>))
+	{
+		result = _RowColumns;
+	}
+	else if (binder.Type == typeof(string))
+	{
+		result = string.Join(",", _RowColumns);
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
+6.2.6 TryInvokeMember()
+
+This method help the DynamicXmlStream class to act similar like List<string> object.
+All lamda expressions that supported with List<string> can also be invoked from this DynamicCsvStream without casting.
+
+public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+{
+	Type stringListType = typeof(List<string>);
+	try
+	{
+		result = stringListType.InvokeMember(
+			binder.Name,
+			BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance,
+			null, _RowColumns, args
+		);
+		return true;
+	}
+	catch
+	{
+		result = null;
+		return false;
+	}
+}
+
+7. CLIENT PROGRAM
+
+Using DynamicXmlStream: Here is the simple client for reading XML file.
+
+dynamic customerOrderXmlReader = DynamicXmlStream.Load(new FileStream("../../Input/CustomerOrder.xml", FileMode.Open));
+Console.WriteLine("First Customer's Company Name = " + customerOrderXmlReader.Root.Customers.Customer[0].CompanyName.Value);
+Console.WriteLine("Orders Shipped to CA: ");
+foreach (dynamic order in 
+	(customerOrderXmlReader.Root.Orders.Order as DynamicXmlStream).AsDynamicEnumerable()
+		.Where(ord => ord.ShipInfo.ShipRegion.Value == "CA"))
+{
+	Console.WriteLine(order.ToString());
+}
+
+Using DynamicCsvStream: Here is the simple client for reading CSV file.
+
+dynamic customerOrderCsvReader = DynamicCsvStream.Load(new StreamReader("../../Input/CustomerOrder.csv"));
+Console.WriteLine("All Processed Orders: ");
+foreach (dynamic order in customerOrderCsvReader)
+{
+	Console.WriteLine("Customer ID: {0}, Ship Date: {1}, Ship Address: {2}", 
+		order.CustomerID,		// Calls TryGetMember
+		order[4],				// Calls TryGetIndex (Int)
+		order["ShipAddress"]	// Calls TryGetIndex (String)
+	);
+}
+
+8. CONCLUSION
+
+The ultimate goal is to make client program as KISS (Keep It Short and Simple). There are multiple ways to read XML and CSV file by using several 
+predefined class and APIs provided by .NET C# but, using DynamicXmlStream and DynamicCsvStream, best APIs are encapsulated and exposed to users by asking
+them to just specify structure of XML node or column name of CSV field. This will make client program simple and clean.
+
+9. REFERENCES
+
+http://msdn.microsoft.com/en-us/library/system.dynamic.dynamicobject(VS.100).aspx
+http://msdn.microsoft.com/en-us/library/ee461504.aspx
+http://jeremyliberman.com/2011/12/toying-with-dynamicobject-reading-xml/
+http://blogs.msdn.com/b/csharpfaq/archive/2009/10/19/dynamic-in-c-4-0-creating-wrappers-with-dynamicobject.aspx
+http://blog.mutable.net/post/2010/07/07/yet-another-take-on-a-dynamicobject-wrapper-for-xml.aspx
+

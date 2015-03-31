@@ -8,7 +8,7 @@ namespace SimpleFlowDiagramLib
 {
     public class Html5GraphRender : IGraphRender
     {
-        public void RenderGraph(
+        public string RenderGraph(
             CanvasDefinition Canvas,
             IList<Node> Nodes,
             GraphDisplayFormatSettings DisplaySettings,
@@ -62,7 +62,7 @@ namespace SimpleFlowDiagramLib
 
             System.IO.File.WriteAllText(OutputPath, RenderedHtml);
 
-            return;
+            return RenderedHtml;
         }
 
         protected string RenderNodes(CanvasDefinition Canvas, IList<Node> Nodes, GraphDisplayFormatSettings DisplaySettings)

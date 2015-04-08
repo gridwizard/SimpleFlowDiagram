@@ -98,6 +98,8 @@ namespace SimpleFlowDiagramLib
         {
             string Tabs = CurrentDepthToTabs(CurrentDepth);
 
+            Node.Depth = CurrentDepth;
+
             RenderedXml += Environment.NewLine;
             RenderedXml += (Tabs + "<NODE");
             RenderedXml += " Depth='" + Node.Depth.ToString() + "'";

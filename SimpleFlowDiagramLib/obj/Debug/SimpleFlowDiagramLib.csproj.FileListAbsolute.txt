@@ -17,3 +17,4 @@ D:\Git\SimpleFlowDiagram\SimpleFlowDiagram\SimpleFlowDiagramLib\bin\Debug\Simple
 D:\Git\SimpleFlowDiagram\SimpleFlowDiagram\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.dll
 D:\Git\SimpleFlowDiagram\SimpleFlowDiagram\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.pdb
 D:\Git\SimpleFlowDiagram\SimpleFlowDiagram\SimpleFlowDiagramLib\bin\Debug\LearningMahesh.DynamicIOStream.dll
+D:\Git\SimpleFlowDiagram\SimpleFlowDiagram\SimpleFlowDiagramLib\obj\Debug\SimpleFlowDiagramLib.csprojResolveAssemblyReference.cache
